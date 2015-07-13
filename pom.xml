@@ -9,12 +9,17 @@
 	<name>OHDSI Integration Module</name>
 	<description>Helps generate OHDSI specific queries based on OpenMRS data</description>
 	<url>https://wiki.openmrs.org/display/docs/OHDSI+Integration+Module+Module</url>
-	
-	<developers>
-		<developer>
-			<name>sri maurya kummamuru,suranga kasthurirathne</name>
-		</developer>
-	</developers>
+
+    <developers>
+        <developer>
+            <name>maurya</name>
+            <email>kummamuru.srimaurya@gmail.com</email>
+        </developer>
+        <developer>
+            <name>snkasthu</name>
+            <email>surangakas@gmail.com</email>
+        </developer>
+    </developers>
 	
 	<organization>
 		<name>OpenMRS</name>
@@ -107,8 +112,8 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<target>1.6</target>
-						<source>1.6</source>
+						<target>1.7</target>
+						<source>1.7</source>
 					</configuration>
 				</plugin>
 				<plugin>

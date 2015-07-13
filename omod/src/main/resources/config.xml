@@ -7,14 +7,17 @@
 	<name>${project.parent.name}</name>
 	<version>${project.parent.version}</version>
 	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
-	<author>sri maurya kummamuru,suranga kasthurirathne</author>
+	<author>Maurya</author>
 	<description>
 		${project.parent.description}
 	</description>
 	<updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
 	<require_version>${openMRSVersion}</require_version>
 	<!-- / Module Properties -->
-
+    <servlet>
+        <servlet-name>downloadInsertStatementsServlet</servlet-name>
+        <servlet-class>${project.parent.groupId}.${project.parent.artifactId}.web.DownloadInsertStatementsServlet</servlet-class>
+    </servlet>
 	
 	<!-- Module Activator -->
 	<activator>${project.parent.groupId}.${project.parent.artifactId}.OHDSIIntegrationActivator</activator>
