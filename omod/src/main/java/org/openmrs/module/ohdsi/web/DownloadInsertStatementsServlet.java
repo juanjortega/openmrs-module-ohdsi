@@ -146,6 +146,34 @@ public class DownloadInsertStatementsServlet extends HttpServlet {
 
                     response.getWriter().write(completeString);
                 }
+                rs.close();
+
+                //condition_occurrence table population
+
+                sql = "SELECT DISTINCT * from openmrs.obs;";
+                rs = stmt.executeQuery(sql);
+                counter=0;
+                while(rs.next()) {
+                    //also considering 0 as null
+                    if(rs.getInt("value_coded")==0)
+                        continue;
+                    counter++;
+                    completeString="\nINSERT INTO condition_occurrence (condition_occurrence_id,person_id,condition_concept_id,condition_start_date,condition_end_date,condition_type_concept_id,stop_reason,provider_id,visit_occurrence_id,condition_source_value,condition_source_concept_id)" +
+                            "VALUES ("+counter+","+rs.getInt("person_id");
+                    completeString=completeString+",'"+rs.getInt("concept_id")+rs.getInt("value_coded")+"'";
+
+                    completeString=completeString + ",'" + rs.getDate("obs_datetime")+"'";
+                    //conditiontype not null - taking it as 0 for now
+                    completeString=completeString+",null,0,null";
+
+                    completeString=completeString+","+rs.getInt("encounter_id")+","+rs.getInt("encounter_id");
+
+                    completeString=completeString+","+rs.getInt("value_coded")+","+rs.getInt("value_coded");
+
+                    completeString=completeString+");";
+                    response.getWriter().write(completeString);
+                }
+                rs.close();
             }catch(SQLException se){
                 //Handle errors for JDBC
                 se.printStackTrace();
