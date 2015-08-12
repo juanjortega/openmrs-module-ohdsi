@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.*;
 import java.util.Date;
 
 /**
@@ -149,13 +149,36 @@ public class DownloadInsertStatementsServlet extends HttpServlet {
                 rs.close();
 
                 //condition_occurrence table population
-
+                int[] valueCodedDoNotIncludeArray={1252,1262,1266,1269,5303,6097};
+                //List<Integer> valueCodedDoNotIncludeArrayList = new ArrayList<Integer>();
+               // valueCodedDoNotIncludeArrayList.addAll(valueCodedDoNotIncludeArray.);
                 sql = "SELECT DISTINCT * from openmrs.obs;";
                 rs = stmt.executeQuery(sql);
                 counter=0;
                 while(rs.next()) {
                     //also considering 0 as null
                     if(rs.getInt("value_coded")==0)
+                        continue;
+                    String valueCodedConceptsql = "select * from concept where concept_id="+rs.getInt("value_coded")+";";
+                    ResultSet valueCodedConceptresutset = stmt2.executeQuery(valueCodedConceptsql);
+                    int valueCodedClassCheck=0;
+                    boolean isUnwantedConcept = false;
+                    while(valueCodedConceptresutset.next()) {
+                        valueCodedClassCheck=valueCodedConceptresutset.getInt("class_id");
+
+                    }
+
+                    //check for diagnosis
+                    if(valueCodedClassCheck!=4 && valueCodedClassCheck!=12 && valueCodedClassCheck!=13)
+                        continue;
+                    int valueCodedConcept=rs.getInt("concept_id");
+                    for(int i: valueCodedDoNotIncludeArray){
+                        if( valueCodedConcept==i) {
+                            isUnwantedConcept = true;
+                        }
+                    }
+                    //remove unwanted concepts
+                    if(isUnwantedConcept)
                         continue;
                     counter++;
                     completeString="\nINSERT INTO condition_occurrence (condition_occurrence_id,person_id,condition_concept_id,condition_start_date,condition_end_date,condition_type_concept_id,stop_reason,provider_id,visit_occurrence_id,condition_source_value,condition_source_concept_id)" +
