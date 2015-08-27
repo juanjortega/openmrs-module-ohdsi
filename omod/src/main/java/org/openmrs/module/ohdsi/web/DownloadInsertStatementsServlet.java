@@ -90,7 +90,7 @@ public class DownloadInsertStatementsServlet extends HttpServlet {
                     //time
                     completeString=completeString+",null";
                     //race
-                    completeString=completeString+",2060-2";
+                    completeString=completeString+",38003600";
                     //ethnicity
                     completeString=completeString+",0";
 
@@ -115,6 +115,23 @@ public class DownloadInsertStatementsServlet extends HttpServlet {
 
                     response.getWriter().write(completeString);
                     //System.out.println(completeString);
+                }
+                rs.close();
+                //Provider Table Population - currently only one provider exists and we would
+                sql = "SELECT DISTINCT * from openmrs.provider;";
+                rs = stmt.executeQuery(sql);
+                while(rs.next()) {
+                    completeString="\nINSERT INTO provider(provider_id, provider_name, npi, dea, specialty_concept_id, care_site_id,year_of_birth, gender_concept_id, provider_source_value, specialty_source_value,specialty_source_concept_id, gender_source_value, gender_source_concept_id)" +
+                            "VALUES ("+rs.getInt("provider_id")+",";
+                    if(rs.getString("name")!=null){
+                        completeString=completeString+"'"+rs.getString("name")+"'";
+                    }
+                    else{
+                        completeString=completeString+"'"+rs.getString("identifier")+"'";
+                    }
+                    completeString=completeString+",null,null,null,null,null,null,null,null,null,null,null);";
+
+                    response.getWriter().write(completeString);
                 }
                 rs.close();
                 //obs table population
@@ -148,6 +165,28 @@ public class DownloadInsertStatementsServlet extends HttpServlet {
                 }
                 rs.close();
 
+                //Visit_occurrence Table Population
+                sql = "SELECT * from openmrs.encounter;";
+                rs = stmt.executeQuery(sql);
+                //int counter=0;
+                while(rs.next()) {
+                    counter++;
+                    completeString="\nINSERT INTO visit_occurrence(visit_occurrence_id, person_id, visit_concept_id, visit_start_date, visit_start_time, visit_end_date, visit_end_time, visit_type_concept_id, provider_id, care_site_id, visit_source_value, visit_source_concept_id)" +
+                            "VALUES ("+rs.getInt("encounter_id")+","+rs.getInt("patient_id")+",9202,'"+rs.getDate("encounter_datetime")+"',null,'"+rs.getDate("encounter_datetime")+"',null,44818518,";
+
+
+                    String encounterProvidersql = "select * from encounter_provider where encounter_id="+rs.getInt("encounter_id")+";";
+                    ResultSet encounterProviderset = stmt2.executeQuery(encounterProvidersql);
+                    String encounterProviderId="";
+                    while(encounterProviderset.next()) {
+                        encounterProviderId = encounterProviderset.getString("encounter_provider_id");
+                    }
+                    completeString=completeString+encounterProviderId+",null,9202,null";
+                    completeString=completeString+");";
+
+                    response.getWriter().write(completeString);
+                }
+                rs.close();
                 //condition_occurrence table population
                 int[] valueCodedDoNotIncludeArray={1252,1262,1266,1269,5303,6097};
                 //List<Integer> valueCodedDoNotIncludeArrayList = new ArrayList<Integer>();
@@ -188,8 +227,14 @@ public class DownloadInsertStatementsServlet extends HttpServlet {
                     completeString=completeString + ",'" + rs.getDate("obs_datetime")+"'";
                     //conditiontype not null - taking it as 0 for now
                     completeString=completeString+",null,0,null";
-
-                    completeString=completeString+","+rs.getInt("encounter_id")+","+rs.getInt("encounter_id");
+                    String encounterProvidersql = "select * from encounter_provider where encounter_id="+rs.getInt("encounter_id")+";";
+                    ResultSet encounterProviderset = stmt2.executeQuery(encounterProvidersql);
+                    String encounterProviderId="";
+                    while(encounterProviderset.next()) {
+                        encounterProviderId = encounterProviderset.getString("encounter_provider_id");
+                    }
+                    //hard coding provider ID as 1 as we only have one provider and there is no specific way to relate an observation with a Provider
+                    completeString=completeString+","+encounterProviderId+","+rs.getInt("encounter_id");
 
                     completeString=completeString+","+rs.getInt("value_coded")+","+rs.getInt("value_coded");
 
